@@ -1,0 +1,27 @@
+
+/etc/systemd/system/haproxy.service
+
+[Unit]
+Description=HAProxy Load Balancer
+Documentation=man:haproxy(1)
+Documentation=file:/usr/share/doc/haproxy/configuration.txt.gz
+# allows us to do millisecond level restarts without triggering alert in Systemd
+StartLimitInterval=0
+StartLimitBurst=0
+After=network.target syslog.service
+Wants=syslog.service
+ 
+[Service]
+Environment="CONFIG=/etc/haproxy/haproxy.cfg" "PIDFILE=/run/haproxy.pid"
+# EXTRAOPTS and RELOADOPS come from this default file
+EnvironmentFile=-/etc/default/haproxy
+ExecStartPre=/usr/sbin/haproxy -f $CONFIG -c -q
+ExecStart=/usr/sbin/haproxy -W -f $CONFIG -p $PIDFILE $EXTRAOPTS
+ExecReload=/usr/sbin/haproxy -f $CONFIG -c -q $EXTRAOPTS $RELOADOPTS
+ExecReload=/bin/kill -USR2 $MAINPID
+KillMode=mixed
+Restart=always
+Type=forking
+ 
+[Install]
+WantedBy=multi-user.target

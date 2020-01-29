@@ -1,0 +1,97 @@
+
+
+#install apache2 and mod_security
+
+apt install apache2
+apt install libapache2-mod-security2
+
+systemctl enable apache2
+systemctl start apache2
+
+#enable mod_security module
+
+a2enmod security2
+
+#check using this command
+
+apachectl -M | grep security
+
+
+cp /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+
+edit  /etc/modsecurity/modsecurity.conf
+
+
+Change the value of SecRuleEngine from DetectionOnly to On
+
+#SecRuleEngine DetectionOnly
+#
+
+SecRuleEngine On
+
+systemctl restart apache2
+
+
+mv /usr/share/modsecurity-crs /usr/share/modsecurity-crs.bk
+git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git /usr/share/modsecurity-crs
+
+cp /usr/share/modsecurity-crs/crs-setup.conf.example /usr/share/modsecurity-crs/crs-setup.conf
+
+
+vi /etc/apache2/mods-enabled/security2.conf
+
+add this lines,
+
+IncludeOptional /usr/share/modsecurity-crs/*.conf
+IncludeOptional "/usr/share/modsecurity-crs/rules/*.conf
+
+http://192.168.128.60/index.html?exec=/bin/bash
+
+check apache access log
+
+tail /var/log/apache2/access.log
+
+https://hostadvice.com/how-to/how-to-setup-modsecurity-for-apache-on-ubuntu-18-04/
+
+
+https://github.com/gnif/mod_rpaf
+
+#mod_rpaf install
+
+#install apxs packages
+
+apt install apache2-dev
+
+git clone https://github.com/gnif/mod_rpaf
+
+cd mod_rpaf
+apxs -cia mod_rpaf.c
+systemctl restart apache2
+
+#check mod_rpaf module
+
+apxs -cia mod_rpaf.capachectl -M | grep rpaf
+
+#Config rpaf 
+
+cd /etc/apache2/conf-enabled
+vi mod_rpaf.conf
+add this configuration
+
+#------from here----------
+LoadModule rpaf_module modules/mod_rpaf-2.0.so
+
+<IfModule rpaf_module>
+        RPAFenable On
+        RPAFproxy_ips 192.168.10.1 192.168.10.3
+        RPAFheader X-Client-IP
+</IfModule>
+#-------end----------------
+
+#restart apache2
+systemctl restart apache2
+
+#url reference
+https://github.com/gnif/mod_rpaf
+http://gurutek.biz/mod_rpaf-and-mod_remoteip/
+

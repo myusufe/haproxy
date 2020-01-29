@@ -1,0 +1,8 @@
+ # Table definition 
+        stick-table type ip size 100k expire 30s store conn_cur
+
+# Allow clean known IPs to bypass the filter 
+        tcp-request connection accept if { src -f /etc/haproxy/whitelist.lst }
+# Shut the new connection as long as the client has already 10 opened 
+        tcp-request connection reject if { src_conn_cur ge 10 }
+        tcp-request connection track-sc1 src

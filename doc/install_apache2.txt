@@ -1,0 +1,16 @@
+
+#Install apache2
+apt-get -y install apache2
+
+# Active SSL module
+
+a2enmod ssl
+
+# Restart Apache2
+systemctl restart apache2
+systemctl enable apache2
+
+#Install php
+apt-get -y install php libapache2-mod-php
+
+#

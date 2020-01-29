@@ -1,0 +1,46 @@
+
+#Create SSL cerfiticates
+
+mkdir /etc/ssl/akaicloud.com
+openssl genrsa -out /etc/ssl/akaicloud.com/akaicloud.com.key 2048 
+openssl req -new -key /etc/ssl/akaicloud.com/akaicloud.com.key \
+                   -out /etc/ssl/akaicloud.com/akaicloud.com.csr
+openssl x509 -req -days 365 -in /etc/ssl/akaicloud.com/akaicloud.com.csr \
+                    -signkey /etc/ssl/akaicloud.com/akaicloud.com.key \
+                    -out /etc/ssl/akaicloud.com/akaicloud.com.crt
+
+#
+# It will create a akaicloud.com.csr, akaicloud.com.key and akaicloud.com.crt file
+#
+
+#create pem file
+
+cat /etc/ssl/akaicloud.com/akaicloud.com.crt /etc/ssl/akaicloud.com/akaicloud.com.key \
+           | sudo tee /etc/ssl/akaicloud.com/akaicloud.com.pem
+
+
+#define frontend and backend
+
+frontend localhost
+    bind *:80
+    bind *:443 ssl crt /etc/ssl/akaicloud.com/akaicloud.com.pem
+    #redirect scheme https if !{ ssl_fc }
+    mode http
+    default_backend http_port_80
+
+backend http_port_80
+        balance roundrobin # round robin lBA
+        server server1 192.168.128.68:80 weight 1 maxconn 512 check
+        server server2 192.168.128.69:80 weight 1 maxconn 512 check
+        server server3 192.168.128.70:80 weight 1 maxconn 512 check
+        server server4 192.168.128.71:80 weight 1 maxconn 512 check
+        server server5 192.168.128.72:80 weight 1 maxconn 512 check
+        server server6 192.168.128.73:80 weight 1 maxconn 512 check
+
+
+#haproxy global configuration
+
+ssl-default-bind-options no-sslv3
+tune.ssl.default-dh-param 2048
+
+

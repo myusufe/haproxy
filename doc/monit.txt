@@ -1,0 +1,23 @@
+#Installing monit
+
+apt install monit -y
+
+#Config monit service,
+
+systemctl start monit
+systemctl enable monit
+
+#Configure monit's keepalived
+#create /etc/monit/conf-available/keepalived file, 
+
+check process keeplived with pidfile /var/run/keepalived.pid
+  start program = "/etc/init.d/keepalived start"
+  stop program = "/etc/init.d/keepalived stop"
+  if 5 restarts with 5 cycles then timeout
+
+#Create symbolic link,
+
+ln -s /etc/monit/conf-available/keepalived  /etc/monit/conf-enabled/
+Restart monit process,
+
+systemctl restart monit

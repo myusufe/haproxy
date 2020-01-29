@@ -1,0 +1,9 @@
+
+
+ab -n 1000 -c 100 http://haproxy01.akaicloud.com/
+siege -t 5S -c 200 http://haproxy01.akaicloud.com
+httperf --server haproxy01.akaicloud.com --port 80 --num-conns 1000 --rate 100
+
+
+#loop
+while true;do ab -n 1000 -c 100 https://haproxy01.akaicloud.com/;sleep 2;done

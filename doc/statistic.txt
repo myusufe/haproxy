@@ -1,0 +1,10 @@
+listen HAProxyLocalStats
+	bind 127.0.0.1:444 name localstats
+	mode http
+	stats enable
+	stats admin if TRUE
+	stats show-legends
+	stats uri /haproxy/haproxy_stats.php?haproxystats=1
+	timeout client 5000
+	timeout connect 5000
+	timeout server 5000

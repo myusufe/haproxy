@@ -1,0 +1,13 @@
+
+
+Requests per second:    177.24 [#/sec] (mean)
+
+#nbproc          2
+
+Requests per second:    66.56 [#/sec] (mean
+
+
+Requests per second:    66.55 [#/sec] (mean)
+
+
+Requests per second:    168.15 [#/sec] (mean)

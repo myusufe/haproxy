@@ -1,0 +1,27 @@
+frontend frontend_http_port_80
+    bind *:443 ssl crt /etc/ssl/akaicloud.com/akaicloud.com.pem alpn h2,http/1.1
+    mode http
+    option httplog
+    option forwardfor
+    default_backend http_port_80
+
+backend http_port_80
+        option httpchk
+        balance roundrobin # round robin lBA
+        server server1 192.168.128.68:443 weight 1 maxconn 512 check ssl verify none alpn h2,http/1.1 ca-file /etc/ssl/akaicloud.com/akaicloud.com.crt
+        server server2 192.168.128.69:443 weight 1 maxconn 512 check ssl verify none alpn h2,http/1.1 ca-file /etc/ssl/akaicloud.com/akaicloud.com.crt
+        server server3 192.168.128.70:443 weight 1 maxconn 512 check ssl verify none alpn h2,http/1.1 ca-file /etc/ssl/akaicloud.com/akaicloud.com.crt
+        server server4 192.168.128.71:443 weight 1 maxconn 512 check ssl verify none alpn h2,http/1.1 ca-file /etc/ssl/akaicloud.com/akaicloud.com.crt
+        server server5 192.168.128.72:443 weight 1 maxconn 512 check ssl verify none alpn h2,http/1.1 ca-file /etc/ssl/akaicloud.com/akaicloud.com.crt
+        server server6 192.168.128.73:443 weight 1 maxconn 512 check ssl verify none alpn h2,http/1.1 ca-file /etc/ssl/akaicloud.com/akaicloud.com.crt
+
+#defaults config
+# need to put this
+ 	option http-use-htx
+
+#global config
+
+	ssl-default-bind-options no-sslv3
+	tune.ssl.default-dh-param 2048
+
+

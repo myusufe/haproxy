@@ -1,0 +1,18 @@
+# [ restrict access Site Configuration]
+frontend roundrobin_http_port_80
+        bind *:80
+        mode http
+   	acl network_allowed src 192.168.128.62 192.168.128.63
+	acl restricted_page path_beg /admin
+	acl restricted_page path_beg /admin2
+	http-request deny if restricted_page !network_allowed
+        default_backend http_port_80
+ 
+backend http_port_80
+	balance roundrobin # round robin lBA
+        server server1 192.168.128.68:80 weight 1 maxconn 512 check
+        server server2 192.168.128.69:80 weight 1 maxconn 512 check
+        server server3 192.168.128.70:80 weight 1 maxconn 512 check
+        server server4 192.168.128.71:80 weight 1 maxconn 512 check
+        server server5 192.168.128.72:80 weight 1 maxconn 512 check
+        server server6 192.168.128.73:80 weight 1 maxconn 512 check

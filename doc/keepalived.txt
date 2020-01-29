@@ -1,0 +1,79 @@
+
+#
+#Install keepalived
+#
+
+apt-get install keepalived
+
+# put sysctl configuration to get share ip address
+# /etc/sysctl.conf
+
+net.ipv4.ip_nonlocal_bind=1
+
+#update sysctl configuration
+
+sysctl -p
+
+# put this configuration for master node file
+# /etc/keepalived/keepalived.conf
+
+global_defs {
+# Keepalived process identifier
+ 	lvs_id haproxy_DH
+}
+# Script used to check if HAProxy is running
+vrrp_script check_haproxy {
+ 	script "killall -0 haproxy"
+ 	interval 2
+ 	weight 2
+}
+# Virtual interface
+# The priority specifies the order in which the assigned interface to take over in a failover
+vrrp_instance VI_01 {
+ 	state MASTER
+ 	interface ens192
+ 	virtual_router_id 51
+ 	priority 101
+# The virtual ip address shared between the two loadbalancers
+ virtual_ipaddress {
+ 	192.168.128.80
+}
+track_script {
+ 	check_haproxy
+}
+}
+
+
+Put this configuration for slave mode,
+
+global_defs {
+# Keepalived process identifier
+	lvs_id haproxy_DH_passive
+}
+# Script used to check if HAProxy is running
+vrrp_script check_haproxy {
+	script "killall -0 haproxy"
+	interval 2
+	weight 2
+}
+# Virtual interface
+# The priority specifies the order in which the assigned interface to take over in a failover
+vrrp_instance VI_01 {
+	state SLAVE
+	interface ens192
+	virtual_router_id 51
+	priority 100
+# The virtual ip address shared between the two loadbalancers
+virtual_ipaddress {
+	192.168.128.80
+}
+track_script {
+	check_haproxy
+}
+}
+
+#restart keepalived service
+
+systemctl restart keepalived
+
+

@@ -1,0 +1,13 @@
+
+
+#create content on each webserver
+
+
+#edit haproxy.conf file and add this on frontend config
+
+# ACL 1
+	acl is-old-domain hdr_dom(host) -i haproxy01.akaicloud.com
+	http-request redirect prefix http://webserver04.akaicloud.com code 301 if is-old-domain
+
+# ACL 2
+        http-request redirect prefix http://webserver04.akaicloud.com code 301 if { hdr_dom(host) -i haproxy01.akaicloud.com  }

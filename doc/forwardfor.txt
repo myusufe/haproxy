@@ -1,0 +1,15 @@
+
+
+#add this line on default or frontend
+
+option forwardfor
+
+#then restart haproxy
+
+#add this flag on apache flag combine configo
+
+%{X-Forwarded-For}i
+
+#then restart apache/webserver
+
+#check access log using tail command

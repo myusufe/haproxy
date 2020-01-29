@@ -1,0 +1,31 @@
+
+
+#postgresql 
+
+edit /etc/postgresql/10/main/pg_hba.conf 
+
+#for demo only
+host    all             all     0.0.0.0/0               trust
+
+#open external connection vi tcp
+
+edit /etc/postgresql/10/main/postgresql.conf
+
+listen_addresses = '*'
+
+systemctl restart postgresql
+
+
+#HAProxy config
+# [ Least Connection Site Configuration]
+frontend frontend_http_port_5432_leastconnection
+        bind 192.168.128.61:5432
+        mode tcp
+	option tcplog
+        default_backend http_port_5432_leastconnection
+
+backend http_port_5432_leastconnection
+        mode tcp
+        balance leastconn # leastconnection lBA
+        option pgsql-check user postgres
+        server server1 192.168.128.68:5432 weight 1 maxconn 512 check

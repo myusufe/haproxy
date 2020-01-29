@@ -1,0 +1,34 @@
+
+HAProxy Performance Tuning
+
+https://blog.codeship.com/performance-tuning-haproxy/
+
+To check CPU hardware number
+
+lshw -short -class cpu
+
+base on this put nbproc value on global configuration
+
+------start------------
+global
+	#put CPU number
+	#http://cbonte.github.io/haproxy-dconv/1.8/configuration.html#nbproc
+	nbproc          2
+	#map CPU
+	# http://cbonte.github.io/haproxy-dconv/1.8/configuration.html#cpu-map
+	cpu-map 1 0
+	cpu-map 2 1
+	cpu-map 3 2
+	cpu-map 4 3
+	# or 
+	# cpu-map auto:1-4   0-3
+	# cpu-map 1-4 0-3
+	# check use haproxy -vv 
+	# MAX_THREADS=64, default=2
+	# http://cbonte.github.io/haproxy-dconv/1.8/configuration.html#nbthread
+	nbthread 4
+
+
+-----------------------
+
+

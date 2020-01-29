@@ -1,0 +1,22 @@
+
+# Table definition  
+# type : the classification of the data weÕl be capturing
+# size : the number of entries it can store
+# expire : the time since a record in the table was last matched, created or refreshed, informs HAProxy when to remove data
+# store : the values that youÕl be savingg
+
+## frontend 
+
+  # Use General Purpose Couter (gpc) 0 in SC1 as a global abuse counter
+  # Monitors the number of request sent by an IP over a period of 10 seconds
+  stick-table type ip size 1m expire 10s store gpc0,http_req_rate(10s)
+  tcp-request connection track-sc1 src
+  tcp-request connection reject if { src_get_gpc0 gt 0 }
+
+## backend
+
+  # If the source IP sent 10 or more http request over the defined period, 
+  # flag the IP as abuser on the frontend
+  acl abuse src_http_req_rate(ft_web) ge 10
+  acl flag_abuser src_inc_gpc0(ft_web)
+  tcp-request content reject if abuse flag_abuser

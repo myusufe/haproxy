@@ -1,0 +1,48 @@
+frontend localhost
+    bind *:80
+    bind *:443 ssl crt /etc/ssl/akaicloud.com/akaicloud.com.pem alpn h2,http/1.1
+    redirect scheme https if !{ ssl_fc }
+    mode http
+    option forwardfor
+    default_backend http_port_80
+
+backend http_port_80
+        option httpchk
+        balance roundrobin # round robin lBA
+        server server1 192.168.128.68:80 weight 1 maxconn 512 check
+        server server2 192.168.128.69:80 weight 1 maxconn 512 check
+        server server3 192.168.128.70:80 weight 1 maxconn 512 check
+        server server4 192.168.128.71:80 weight 1 maxconn 512 check
+        server server5 192.168.128.72:80 weight 1 maxconn 512 check
+        server server6 192.168.128.73:80 weight 1 maxconn 512 check
+
+#support http2 and http1.1
+# [ round robin Site Configuration]
+frontend roundrobin_http_port_80
+        bind *:80
+        bind *:443 ssl crt /etc/ssl/akaicloud.com/akaicloud.com.pem alpn h2,http/1.1
+        mode http
+        option forwardfor
+        use_backend http_rr_port_80 if { ssl_fc_alpn -i h2 }
+        default_backend http_rr_port_80_fallback
+
+backend http_rr_port_80
+        balance roundrobin # round robin lBA
+        server server1 192.168.128.68:80 weight 1 maxconn 512 check
+        server server2 192.168.128.69:80 weight 1 maxconn 512 check
+        server server3 192.168.128.70:80 weight 1 maxconn 512 check
+
+backend http_rr_port_80_fallback
+        server server4 192.168.128.71:80 weight 1 maxconn 512 check
+        server server5 192.168.128.72:80 weight 1 maxconn 512 check
+        server server6 192.168.128.73:80 weight 1 maxconn 512 check
+
+#global config
+
+ssl-default-bind-options no-sslv3
+tune.ssl.default-dh-param 2048
+
+As you see, we set one Backend for HTTP/2 and another one for HTTP/1.1 and lower Protocol Versions as Fallback, which is important to support Clients which cannot speak HTTP/2.
+The two Backends are very important and mandatory due to the fact that we are using TCP behind SSL Offloading, because apache/nginx cannot detect which HTTP Protocol (if its HTTP/2 or HTTP/1.0) the Client is initially using.
+
+

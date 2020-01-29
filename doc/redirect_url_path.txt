@@ -1,0 +1,15 @@
+
+
+#create content on each webserver
+
+mkdir -p content/v1/page/;cp index.php content/v1/page/
+mkdir -p content/v2/page/;cp index.php content/v2/page/
+
+#edit haproxy.conf file and add this on frontend config
+
+# ACL 1
+	acl new_version  path_beg /content/v2/page
+        redirect location http://haproxy01.akaicloud.com/content/v1/page code 302 if new_version
+
+# ACL 2
+        redirect location http://haproxy01.akaicloud.com/content/v1/page code 302 if { path_beg /content/v2/page  }

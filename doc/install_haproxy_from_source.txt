@@ -1,0 +1,127 @@
+#Enable IP forwarding and binding to non-local IP addresses
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+echo "net.ipv4.ip_nonlocal_bind = 1" >> /etc/sysctl.conf
+
+#Update kernel configuration
+sysctl -p
+net.ipv4.ip_forward = 1
+net.ipv4.ip_nonlocal_bind = 1
+
+#Install LUA packages from source 
+
+##Install readline development libraries
+#
+
+apt install gcc make libreadline-dev 
+
+##Download LUA file and install it
+#
+
+wget https://www.lua.org/ftp/lua-5.3.5.tar.gz --no-check-certificate
+tar xvfz lua-5.3.5.tar.gz
+cd lua-5.3.5/
+make INSTALL_TOP=/opt/lua-5.3.5 linux install
+
+##Edit /etc/profile and add this line,
+#
+
+export PATH="/opt/lua-5.3.5/bin/:$PATH"
+
+And then run that export on console also
+
+##Install make packages
+#
+
+apt -y install libssl-dev
+apt -y install libpcre++-dev
+apt -y install build-essential
+apt -y install libz-dev
+apt -y install libsystemd-dev
+
+## Create HAProxy user
+#
+
+id -u haproxy &> /dev/null || useradd -s /usr/sbin/nologin -r haproxy
+
+## Download haproxy source file
+#
+
+wget http://www.haproxy.org/download/2.1/src/haproxy-2.1.0.tar.gz
+
+## Compile haproxy
+#
+
+tar xvfz haproxy-2.1.0.tar.gz
+cd haproxy-2.1.0
+make clean
+make -j $(nproc) TARGET=linux-glibc USE_OPENSSL=1 USE_ZLIB=1 USE_LUA=1 USE_PCRE=1 USE_SYSTEMD=1 LUA_INC=/opt/lua-5.3.5/include LUA_LIB=/opt/lua-5.3.5/lib
+make install
+
+## Create symbolik link
+#
+
+ln -s /usr/local/sbin/haproxy  /usr/sbin/
+
+## Create HAProxy Error file
+#
+
+mkdir -p /etc/haproxy/errors/
+cp -fr examples/errorfiles/* /etc/haproxy/errors/
+
+## Create manual page
+#
+mkdir -p /usr/share/doc/haproxy/
+wget -qO - https://raw.githubusercontent.com/horms/haproxy/master/doc/configuration.txt | gzip -c > /usr/share/doc/haproxy/configuration.txt.gz
+
+## Create Socket and Stats Directory
+#
+mkdir /run/haproxy/
+mkdir /var/lib/haproxy
+
+## Add global, default and frontend statistic config 
+#  on /etc/haproxy/haproxy.cfg file
+#
+
+
+global
+        log /dev/log    local0
+        log /dev/log    local1 notice
+        chroot /var/lib/haproxy
+        stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+        stats timeout 30s
+        user haproxy
+        group haproxy
+        daemon
+
+
+defaults
+        log     global
+        mode    http
+        option  httplog
+        option  dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+        errorfile 400 /etc/haproxy/errors/400.http
+        errorfile 403 /etc/haproxy/errors/403.http
+        errorfile 408 /etc/haproxy/errors/408.http
+        errorfile 500 /etc/haproxy/errors/500.http
+        errorfile 502 /etc/haproxy/errors/502.http
+        errorfile 503 /etc/haproxy/errors/503.http
+        errorfile 504 /etc/haproxy/errors/504.http
+ 
+frontend stats
+    bind *:8080
+    stats enable
+    stats uri /stats
+    stats refresh 10s
+    stats auth admin:admin
+
+
+
+## Restart haproxy
+#
+
+systemctl restart haproxy
+
+#check HAProxy static report

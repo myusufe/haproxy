@@ -1,0 +1,3 @@
+Append 'www.' prefix in front of all hosts not having
+
+http-request redirect code 301 location http://www.%[hdr(host)]%[capture.req.uri] unless { hdr_beg(host) -i www }

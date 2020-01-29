@@ -1,0 +1,18 @@
+
+vi /etc/rsyslog.d/49-haproxy.conf 
+
+Put this configuration on /etc/rsyslog.d/49-haproxy.conf file
+
+# Create an additional socket in haproxy's chroot in order to allow logging via
+# /dev/log to chroot'ed HAProxy processes
+$AddUnixListenSocket /var/lib/haproxy/dev/log
+
+# Send HAProxy messages to a dedicated logfile
+if $programname startswith 'haproxy' then /var/log/haproxy.log
+&~
+
+
+Restart rsyslog haproxy
+
+systemctl restart rsyslog
+systemctl restart haproxy

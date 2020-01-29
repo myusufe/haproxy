@@ -1,0 +1,12 @@
+
+
+#print out the info
+echo "show info" | sudo socat - /run/haproxy/admin.sock
+echo "show stat" | sudo socat - /run/haproxy/admin.sock
+echo "show table" | sudo socat - /run/haproxy/admin.sock
+
+#filter
+echo "show info" | sudo socat - /run/haproxy/admin.sock | grep Ssl
+
+#echo all
+echo "show info;show stat;show table" | socat - /run/haproxy/admin.sock stdio

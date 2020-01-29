@@ -1,0 +1,39 @@
+
+#go install
+
+wget https://dl.google.com/go/go1.13.5.linux-amd64.tar.gz
+tar -xvf go1.13.3.linux-amd64.tar.gz
+mv go /usr/local
+
+edit /etc/profile
+
+export GOROOT=/usr/local/go
+export PATH="/opt/lua-5.3.5/bin/:$GOROOT/bin:$PATH"
+
+#clone 
+git clone https://github.com/haproxytech/dataplaneapi.git
+
+cd dataplaneapi
+make update
+make build
+
+cp -frp ./build/dataplaneapi /usr/local/bin/
+
+#add userlist on haproxy config file
+
+userlist dataplane-api
+    user dataplaneapi insecure-password password
+
+we can create encrypt password as
+
+apt install -y whois
+mkpasswd -m sha-256 password
+$5$aVnIFECJ$2QYP64eT
+TXZ1grSjwwdoQxK/AP8kcOflEO1Q5fc.5aA
+
+#add on haproxy file
+
+userlist dataplane-api
+    user dataplaneapi password $5$aVnIFECJ$2QYP64eTTXZ1grSjwwdoQxK/AP8kcOflEO1Q5fc.5aA
+
+

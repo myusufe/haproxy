@@ -1,0 +1,127 @@
+
+#install pacemakeri both nodes
+apt-get install pacemaker
+
+#install corosync both nodes
+
+apt-get install haveged
+
+#generate corosync key
+
+corosync-keygen
+
+#copy key to second node
+scp /etc/corosync/authkey 192.168.128.62:/etc/corosync/
+chown root: /etc/corosync/authkey
+chmod 400 /etc/corosync/authkey
+
+#configure corosync cluster
+
+edit /etc/corosync/corosync.conf file
+
+totem {
+        version: 2
+
+        # How long before declaring a token lost (ms)
+        token: 3000
+
+        # How many token retransmits before forming a new configuration
+        token_retransmits_before_loss_const: 10
+
+        # How long to wait for join messages in the membership protocol (ms)
+        join: 60
+
+        # How long to wait for consensus to be achieved before starting a new round of membership configuration (ms)
+        consensus: 3600
+
+        # Turn off the virtual synchrony filter
+        vsftype: none
+
+        # Number of messages that may be sent by one processor on receipt of the token
+        max_messages: 20
+
+        # Limit generated nodeids to 31-bits (positive signed integers)
+        clear_node_high_bit: yes
+
+        # Disable encryption
+        secauth: off
+
+        # How many threads to use for encryption/decryption
+        threads: 0
+
+        # Optionally assign a fixed node id (integer)
+        # nodeid: 1234
+
+        # This specifies the mode of redundant ring, which may be none, active, or passive.
+        rrp_mode: none
+		interface {
+                # The following values need to be set based on your environment 
+                ringnumber: 0
+                bindnetaddr: 192.168.128.60
+                mcastaddr: 226.94.1.1
+                mcastport: 5405
+        }
+}
+
+amf {
+        mode: disabled
+}
+
+quorum {
+        # Quorum for the Pacemaker Cluster Resource Manager
+        provider: corosync_votequorum
+        expected_votes: 1
+}
+
+aisexec {
+        user:   root
+        group:  root
+}
+
+nodelist {
+  node {
+    ring0_addr: 192.168.128.60
+    name: haproxy01.akaiclodu.com
+    nodeid: 1
+  }
+  node {
+    ring0_addr: 192.168.128.62
+    name: haproxy02.akaicloud.com
+	nodeid: 2
+  }
+}
+
+
+#edit pcmk file
+
+vi /etc/corosync/service.d/pcmk
+
+service {
+  name: pacemaker
+  ver: 1
+} 
+
+#open file service for boot and run command
+
+vi /etc/default/corosync
+
+# start corosync at boot [yes|no]
+START=yes # service corosync start
+
+#start corosync as
+
+service corosync start
+
+sudo corosync-cmapctl | grep members
+
+sudo update-rc.d pacemaker defaults 20 01
+
+sudo service pacemaker start
+
+sudo crm status
+
+
+https://www.digitalocean.com/community/tutorials/how-to-create-a-high-availability-setup-with-corosync-pacemaker-and-floating-ips-on-ubuntu-14-04
+
+
+

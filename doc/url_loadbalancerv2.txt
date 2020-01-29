@@ -1,0 +1,10 @@
+backend be1 # this is your default backend
+  ...
+backend be2 # this is for /tag-02 requests
+  ...
+
+frontend fe
+  ...
+  default_backend be1
+  acl url_tag02 path_beg /tag-02
+  use_backend be2 if url_tag02
