@@ -46,3 +46,8 @@ dataplaneapi \
 --reload-cmd "systemctl reload haproxy" \
 --reload-delay 5 \
 --userlist dataplane-api
+
+
+Access useing browser
+http://haproxy01.local:5555/v2/services/haproxy/configuration/
+
