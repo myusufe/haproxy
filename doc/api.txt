@@ -38,6 +38,8 @@ TXZ1grSjwwdoQxK/AP8kcOflEO1Q5fc.5aA
 userlist dataplane-api
     user dataplaneapi password $5$aVnIFECJ$2QYP64eTTXZ1grSjwwdoQxK/AP8kcOflEO1Q5fc.5aA
 
+# Run dataplane api using command line
+
 dataplaneapi \
 --host 0.0.0.0 \
 --port 5555 \
@@ -47,7 +49,14 @@ dataplaneapi \
 --reload-delay 5 \
 --userlist dataplane-api
 
+# run dataplane api using HAProxy Process Manager
 
-Access useing browser
+#add this line to haproxy.cfg
+
+program api
+    command dataplaneapi --host 0.0.0.0 --port 5555 --haproxy-bin /usr/sbin/haproxy --config-file /etc/haproxy/haproxy.cfg --reload-cmd "systemctl reload haproxy" --reload-delay 5 --userlist controller
+
+#Access using browser
+
 http://haproxy01.local:5555/v2/services/haproxy/configuration/
 
