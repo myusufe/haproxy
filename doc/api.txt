@@ -14,12 +14,13 @@ export PATH="/opt/lua-5.3.5/bin/:$GOROOT/bin:$PATH"
 git clone https://github.com/haproxytech/dataplaneapi.git
 
 cd dataplaneapi
-make update
-make build
+make all 
 
 cp -frp ./build/dataplaneapi /usr/local/bin/
 
 #add userlist on haproxy config file
+
+stats socket /run/haproxy/admin.sock user haproxy group haproxy mode 666 level admin
 
 userlist dataplane-api
     user dataplaneapi insecure-password password
@@ -33,7 +34,15 @@ TXZ1grSjwwdoQxK/AP8kcOflEO1Q5fc.5aA
 
 #add on haproxy file
 
+
 userlist dataplane-api
     user dataplaneapi password $5$aVnIFECJ$2QYP64eTTXZ1grSjwwdoQxK/AP8kcOflEO1Q5fc.5aA
 
-
+dataplaneapi \
+--host 0.0.0.0 \
+--port 5555 \
+--haproxy-bin $(which haproxy) \
+--config-file /etc/haproxy/haproxy.cfg \
+--reload-cmd "systemctl reload haproxy" \
+--reload-delay 5 \
+--userlist dataplane-api
