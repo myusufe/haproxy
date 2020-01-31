@@ -1,0 +1,32 @@
+##
+## GET request
+##
+
+curl -X GET --user dataplaneapi:mypassword \
+-H "Content-Type: application/json" \
+http://localhost:5555/v2/services/haproxy/configuration/frontends
+
+
+curl -X GET --user dataplaneapi:mypassword \
+-H "Content-Type: application/json" \
+http://localhost:5555/v2/services/haproxy/configuration/backends
+
+curl -X GET --user dataplaneapi:mypassword \
+-H "Content-Type: application/json" \
+http://localhost:5555/v2/services/haproxy/configuration/frontends | jq '.data[].name'
+
+## 
+## POST request
+##
+
+# Add frontend
+#
+# make sure haproxy.cfg has "backend http_port_80" config
+#
+
+curl -X POST --user dataplaneapi:mypassword \
+  -H "Content-Type: application/json" \
+  -d '{"name": "test_frontend", "default_backend": "http_port_80", "mode": "http", "maxconn": 2000}' \
+  "http://localhost:5555/v2/services/haproxy/configuration/frontends?version=2"
+
+
