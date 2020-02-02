@@ -7,5 +7,5 @@ For who want to learn HAProxy more detail from Udemy online course, please acces
 
 https://www.udemy.com/course/build-own-haproxy-load-balancer-on-amazon-aws/?referralCode=1DBA6240E6567CC1F28B
 
-If you don't have budget or money, please contact me, and I will give coupon away for you.
+If you don't have budget or money, please contact me, and I will give a free coupon away for you.
 
