@@ -1,0 +1,7 @@
+deb [arch=amd64] http://ubuntu1604repo.akaicloud.com/ubuntu/ xenial main restricted
+deb [arch=amd64] http://ubuntu1604repo.akaicloud.com/ubuntu/ xenial-updates main restricted
+deb [arch=amd64] http://ubuntu1604repo.akaicloud.com/ubuntu/ xenial universe
+deb [arch=amd64] http://ubuntu1604repo.akaicloud.com/ubuntu/ xenial-updates universe
+deb [arch=amd64] http://ubuntu1604repo.akaicloud.com/ubuntu/ xenial multiverse
+deb [arch=amd64] http://ubuntu1604repo.akaicloud.com/ubuntu/ xenial-updates multiverse
+#deb [arch=amd64] http://ubuntu1604repo.akaicloud.com/ubuntu/ xenial-backports main restricted universe multiverse

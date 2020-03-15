@@ -1,0 +1,29 @@
+# Infrastructure
+# - Defines the vCenter / vSphere environment
+deploy_vsphere_vcenter: 'vcenter.akaicloud.com'
+deploy_vsphere_user: 'admin@akaicloud.com'
+deploy_vsphere_password: 'password'
+deploy_vsphere_datacenter: 'Datacenter01'
+deploy_folder_name: 'HAProxy'
+deploy_folder_type: 'vm'
+deploy_vsphere_folder: '{{ deploy_vsphere_datacenter }}/vm/{{ deploy_folder_name }}'
+deploy_vsphere_cluster: 'Cluster01'
+deploy_vsphere_resourcepool: 'HAProxy'
+deploy_vsphere_datastore: 'vsanDatastore'
+
+# Guest
+# - Describes virtual machine common options
+guest_network: 'management'
+guest_netmask: '255.255.255.0'
+guest_gateway: '192.168.128.1'
+guest_dns_server: '192.168.125.53'
+guest_domain_name: 'akaicloud.com'
+guest_id: 'ubuntu64Guest'
+guest_memory: '4096'
+guest_vcpu: '2'
+guest_ip_type: 'static'
+#guest_template: ''
+guest_wait_for_ip_address: 'yes'
+guest_state: 'poweredon'
+guest_device_type: 'vmxnet3'
+

@@ -1,0 +1,11 @@
+[haproxy]
+haproxy01 guest_custom_ip='192.168.128.120' guest_notes='HAProxy Server 01'
+haproxy02 guest_custom_ip='192.168.128.121' guest_notes='HAProxy Server 02'
+
+#Ansible credential
+[all:vars]
+guest_template='ubuntu1604_template_16GB'
+ansible_connection=ssh
+ansible_ssh_user=akaicloud
+ansible_ssh_pass=password
+ansible_sudo_pass=password

@@ -1,0 +1,13 @@
+---
+
+# HAProxy Server configuration variables
+haproxy_admin_sock_file: '/run/haproxy/admin.sock'
+haproxy_username: 'haproxy'
+haproxy_groupname: 'haproxy'
+haproxy_default_mode: 'http'
+haproxy_dataplaneapi_user: 'dataplaneapi'
+haproxy_frontend_stats_port: '8080'
+haproxy_frontend_stats_username: 'admin'
+haproxy_frontend_stats_password: 'admin'
+haproxy_errors_dir: '/etc/haproxy/errors'
+sources_list_path: '/etc/apt/sources.list'

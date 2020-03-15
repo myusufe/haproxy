@@ -1,0 +1,12 @@
+# handlers file for HAProxy server
+
+- name: restart haproxy
+  service:
+    name: "{{ haproxy_service }}"
+    state: restarted
+    enabled: yes
+  become: yes
+
+- name: apt update
+  command: apt update
+  become: yes

@@ -1,0 +1,156 @@
+---
+# Deploy HAProxy VM from a template using Ansible 'vmware_guest' module
+  - name: Deploy HAProxy Server VM
+    vmware_guest:
+      hostname: '{{ deploy_vsphere_vcenter }}'
+      username: '{{ deploy_vsphere_user }}'
+      password: '{{ deploy_vsphere_password }}'
+      validate_certs: no
+      datacenter: '{{ deploy_vsphere_datacenter }}'
+      cluster: '{{ deploy_vsphere_cluster }}'
+      resource_pool: '{{ deploy_vsphere_resourcepool }}'
+      folder: '{{ deploy_vsphere_folder }}'
+      name: '{{ inventory_hostname }}'
+      state: '{{ guest_state }}' 
+      guest_id: '{{ guest_id }}'
+      annotation: "{{ guest_notes }}"
+      networks:
+      - name: '{{ guest_network }}'
+        ip: '{{ guest_custom_ip }}'
+        netmask: '{{ guest_netmask }}'
+        gateway: '{{ guest_gateway }}'
+        type: '{{ guest_ip_type }}'
+        dns_servers:
+        - '{{ guest_dns_server }}'
+      hardware:
+        memory_mb: '{{ guest_memory }}'
+        num_cpus: '{{ guest_vcpu }}'
+      customization:
+        dns_servers:
+        - '{{ guest_dns_server }}'
+        domain : '{{ guest_domain_name }}'
+        hostname: '{{ inventory_hostname }}'
+      template: '{{ guest_template }}'
+      wait_for_ip_address: '{{ guest_wait_for_ip_address }}' 
+      state: '{{ guest_state }}' 
+    delegate_to: localhost
+
+# Config local repo
+  - name: "Config local repo"
+    copy:
+      src: sources.list
+      dest: '{{ sources_list_path }}'
+      owner: 'root'
+      group: 'root'
+      mode: '0644'
+    become: yes
+    notify:
+      - apt update
+
+# Install HAProxy packages
+  - name: "Install HAProxy packages using apt"
+    apt:
+      name: haproxy
+      state: present
+    become: yes
+    notify:
+      - restart haproxy
+
+# Create /etc/haproxy/errors directory
+  - name: "Create /etc/haproxy/errors directory"
+    stat:
+      path: '{{ haproxy_errors_dir }}'
+    register: my_folder
+ 
+  - name: "echo if directory already existed"
+    debug:
+      msg: "{{ haproxy_errors_dir }} directory is already existed"
+    when: my_folder.stat.exists
+ 
+  - name: "Ansible Create {{ haproxy_errors_dir }} directory if not exists"
+    file:
+     path: '{{ haproxy_errors_dir }}'
+     state: directory
+     mode: 0755
+     group: root
+     owner: root
+    become: yes
+    when: my_folder.stat.exists == false
+
+# Copy errors file to /etc/haproxy/errors directory
+  - name: Copy 400.http file with owner and permissions
+    copy:
+      src: 400.http 
+      dest: '{{ haproxy_errors_dir }}'
+      owner: '{{ haproxy_username }}'
+      group: '{{ haproxy_groupname }}'
+      mode: '0644'
+    become: yes
+ 
+  - name: Copy 403.http file with owner and permissions
+    copy:
+      src: 403.http 
+      dest: '{{ haproxy_errors_dir }}'
+      owner: '{{ haproxy_username }}'
+      group: '{{ haproxy_groupname }}'
+      mode: '0644'
+    become: yes
+
+  - name: Copy 408.http file with owner and permissions
+    copy:
+      src: 408.http 
+      dest: '{{ haproxy_errors_dir }}'
+      owner: '{{ haproxy_username }}'
+      group: '{{ haproxy_groupname }}'
+      mode: '0644'
+    become: yes
+
+  - name: Copy 500.http file with owner and permissions
+    copy:
+      src: 500.http
+      dest: '{{ haproxy_errors_dir }}'
+      owner: '{{ haproxy_username }}'
+      group: '{{ haproxy_groupname }}'
+      mode: '0644'
+    become: yes
+  - name: Copy 502.http file with owner and permissions
+    copy:
+      src: 502.http
+      dest: '{{ haproxy_errors_dir }}'
+      owner: '{{ haproxy_username }}'
+      group: '{{ haproxy_groupname }}'
+      mode: '0644'
+    become: yes
+
+  - name: Copy 503.http file with owner and permissions
+    copy:
+      src: 503.http
+      dest: '{{ haproxy_errors_dir }}'
+      owner: '{{ haproxy_username }}'
+      group: '{{ haproxy_groupname }}'
+      mode: '0644'
+    become: yes
+
+  - name: Copy 504.http file with owner and permissions
+    copy:
+      src: 504.http
+      dest: '{{ haproxy_errors_dir }}'
+      owner: '{{ haproxy_username }}'
+      group: '{{ haproxy_groupname }}'
+      mode: '0644'
+    become: yes
+
+# Configure HAProxy Server configuration
+  - name: "Configure HAProxy Server config"
+    template:
+      src: haproxy.cfg.j2
+      dest: "{{ haproxy_conf }}"
+      owner: root
+      group: root
+      mode: 0644
+    notify:
+      - restart haproxy
+    become: yes
+    tags:
+      - haproxy
+

@@ -1,0 +1,13 @@
+
+# Create VM folder 
+  - name: Create HAProxy Server folder VM
+    vcenter_folder:
+      hostname: '{{ deploy_vsphere_vcenter }}'
+      username: '{{ deploy_vsphere_user }}'
+      password: '{{ deploy_vsphere_password }}'
+      validate_certs: no
+      datacenter_name: '{{ deploy_vsphere_datacenter }}'
+      folder_name: '{{ deploy_folder_name }}'
+      folder_type: '{{ deploy_folder_type }}'
+      state: present
+    delegate_to: localhost

@@ -1,0 +1,5 @@
+---
+# vars file for HAProxy Server (Ubuntu)
+
+haproxy_service: 'haproxy'
+haproxy_conf: '/etc/haproxy/haproxy.cfg'

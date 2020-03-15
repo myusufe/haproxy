@@ -1,0 +1,7 @@
+---
+- hosts: localhost 
+  gather_facts: false
+  vars_files:
+    - all_config.yml
+  roles:
+     - create-folder
