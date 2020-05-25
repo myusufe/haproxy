@@ -1,0 +1,55 @@
+
+
+# Create /var/log/haproxy directory
+
+mkdir /var/log/haproxy
+chmod 775 /var/log/haproxy
+chgrp adm /var/log/haproxy
+
+## Define HAProxy log in rsyslog.conf file
+
+# Collect log with UDP
+$ModLoad imudp
+$UDPServerAddress 127.0.0.1
+$UDPServerRun 514
+#
+# # Creating separate log files based on the severity
+local0.* /var/log/haproxy/haproxy-traffic.log
+local0.notice /var/log/haproxy/haproxy-admin.log
+
+## Define log config in /etc/haproxy/haproxy.conf file
+
+global
+    log 127.0.0.1:514  local0 
+
+
+defaults
+    log global
+    option httplog
+
+
+## Create rsyslog forwarding file under /etc/rsyslog.d
+
+$InputFilePollInterval 10
+$InputFileName /var/log/haproxy/haproxy.log
+$InputFileTag haproxy
+$InputFileStateFile haproxy
+$PrivDropToGroup adm
+$InputFileSeverity app
+$InputRunFileMonitor
+$InputFilePersistStateInterval 1000
+
+$InputFilePollInterval 10
+$InputFileName /var/log/haproxy/haproxy-traffic.log
+$InputFileTag haproxy
+$InputFileStateFile haproxy
+$PrivDropToGroup adm
+$InputFileSeverity app
+$InputRunFileMonitor
+$InputFilePersistStateInterval 1000
+
+
+## Define log forwarding server in /etc/rsyslog.conf
+## Using UDP and 5513 port number
+
+*.* @192.168.128.90:5513
